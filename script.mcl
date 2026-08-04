@@ -1,0 +1,5 @@
+scoreboard set player_hp 100
+scoreboard add player_hp -20
+
+say "Player health:"
+say $player_hp
