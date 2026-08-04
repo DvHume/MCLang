@@ -3,12 +3,6 @@ package org.dvhume.mclang;
 import java.util.HashMap;
 import java.util.Map;
 
-/*
- * Copyright (c) 2026 DvHume
- *
- * Licensed under the MIT License.
- * See the LICENSE file in the project root for license information
- */
 public class Environment {
     private final Map<String, Object> variables = new HashMap<>();
 

@@ -8,12 +8,6 @@ import org.dvhume.mclang.lexer.TokenType;
 import java.util.ArrayList;
 import java.util.List;
 
-/*
- * Copyright (c) 2026 DvHume
- *
- * Licensed under the MIT License.
- * See the LICENSE file in the project root for license information
- */
 public class Parser {
 
  private final List<Token> tokens;
@@ -39,6 +33,8 @@ public class Parser {
    return parseSay();
   } else if (token.getType() == TokenType.SCOREBOARD) {
    return parseScoreboard();
+  } else if (token.getType() == TokenType.EXECUTE) {
+   return parseExecute();
   }
   throw new RuntimeException("String " + token.getLine() + ": Command expected, received: " + token.getValue());
  }
@@ -70,6 +66,21 @@ public class Parser {
    throw new RuntimeException("String " + valueToken.getLine() + ": The value must be a number or a variable");
   }
   return new ProgramNode.ScoreboardStatementNode(modeToken.getValue(), varToken.getValue(), valueToken);
+ }
+
+ private ASTNode parseExecute() {
+  consume(TokenType.EXECUTE, "Expected 'execute'");
+  consume(TokenType.IF, "Expected 'if'");
+  consume(TokenType.SCORE, "Expected 'score'");
+
+  Token varToken = consume(TokenType.IDENTIFIER, "Expected variable name");
+  consume(TokenType.MATCHES, "Expected 'matches'");
+
+  Token expectedValue = advance();
+  consume(TokenType.RUN, "Expected 'run'");
+
+  ASTNode thenBranch = parseStatement();
+  return new ProgramNode.ExecuteIfNode(varToken.getValue(), expectedValue, thenBranch);
  }
 
  private boolean isAtEnd() {

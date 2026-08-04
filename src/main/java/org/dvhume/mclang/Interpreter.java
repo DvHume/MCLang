@@ -4,12 +4,6 @@ import org.dvhume.mclang.ast.ASTNode;
 import org.dvhume.mclang.ast.ProgramNode;
 import org.dvhume.mclang.lexer.Token;
 
-/*
- * Copyright (c) 2026 DvHume
- *
- * Licensed under the MIT License.
- * See the LICENSE file in the project root for license information
- */
 public class Interpreter {
 
     private final Environment env = new Environment();
@@ -23,6 +17,10 @@ public class Interpreter {
     private void execute(ASTNode node) {
         if (node instanceof ProgramNode.ScoreboardStatementNode scoreboard) {
             executeScoreboard(scoreboard);
+        } else if (node instanceof ProgramNode.SayStatementNode say) {
+            executeSay(say);
+        } else if (node instanceof ProgramNode.ExecuteIfNode execIf) {
+            executeIf(execIf);
         }
     }
 
@@ -44,6 +42,15 @@ public class Interpreter {
         } else if ("add".equals(node.getMode())) {
             int current = env.has(varName) ? (int) env.get(varName) : 0;
             env.set(varName, current + intVal);
+        }
+    }
+
+    private void executeIf(ProgramNode.ExecuteIfNode ifNode) {
+        Object actualVal = env.get(ifNode.getVarName());
+        Object expectedVal = evaluateToken(ifNode.getExpectedValue());
+
+        if (actualVal != null && actualVal.equals(expectedVal)) {
+            execute(ifNode.getThenBranch());
         }
     }
 

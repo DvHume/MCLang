@@ -7,18 +7,30 @@ import org.dvhume.mclang.lexer.Lexer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-/*
- * Copyright (c) 2026 DvHume
- * 
- * Licensed under the MIT License.
- * See the LICENSE file in the project root for license information
- */
- public class Main {
+public class Main {
     public static void main(String[] args) {
-        String fileName = args.length > 0 ? args[0] : "script.mcl";
+        if (args.length > 0 && (args[0].equals("--version") || args[0].equals("-v"))) {
+            System.out.println("MCLang v0.1.0 (Java 21+)");
+        }
+        if (args.length < 2 || !args[0].equals("run")) {
+            return;
+        }
+        String filePath = args[1].trim().replaceAll("^\"|\"$", "");
+
+        if (!filePath.toLowerCase().endsWith(".mcl")) {
+            System.err.println("Error: Файл должен иметь расширение .mcl");
+            System.err.println("Вы передали имя файла: '" + filePath + "'");
+            return;
+        }
 
         try {
-            String code = Files.readString(Path.of(fileName));
+            Path path = Path.of(filePath);
+            if (!Files.exists(path)) {
+                System.err.println("Error: File '" + filePath + "' not found");
+                return;
+            }
+
+            String code = Files.readString(path);
 
             Lexer lexer = new Lexer(code);
             var tokens = lexer.tokenize();
@@ -32,5 +44,10 @@ import java.nio.file.Path;
             System.err.println("Ошибка выполнения");
             e.printStackTrace();
         }
+    }
+
+    private static void printUsage() {
+        System.out.println("Use:");
+        System.out.println("mclang run <filename.mcl> Run File");
     }
 }

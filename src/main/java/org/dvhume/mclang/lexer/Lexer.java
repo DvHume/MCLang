@@ -35,12 +35,26 @@ public class Lexer {
             } else if (c == '"') {
                 tokens.add(readString());
             } else if (c == '$') {
-                tokens.add(readString());
+                tokens.add(readVariable());
             } else if (Character.isDigit(c) || (c == '-' && Character.isDigit(peekNext()))) {
                 tokens.add(readNumber());
             } else if (Character.isLetter(c) || c == '_') {
                 tokens.add(readIdentifier());
-            } else {
+            } else if (c == '+') {
+                advance();
+                tokens.add(new Token(TokenType.PLUS, "+", line));
+            } else if (c == '-') {
+                if (Character.isDigit(peekNext())) {
+                    tokens.add(readNumber());
+                } else {
+                    advance();
+                    tokens.add(new Token(TokenType.MINUS, "-", line));
+                }
+            }
+            else if (c == '*') { advance(); tokens.add(new Token(TokenType.STAR, "*", line)); }
+            else if (c == '/') { advance(); tokens.add(new Token(TokenType.SLASH, "/", line)); }
+            else if (c == '=') { advance(); tokens.add(new Token(TokenType.EQUAL, "=", line)); }
+            else {
                 throw new RuntimeException("String " + line + ": Unknown symbol '" + c + "'");
             }
         }
@@ -79,6 +93,16 @@ public class Lexer {
         return new Token(TokenType.STRING, sb.toString(), startLine);
     }
 
+    private Token readVariable() {
+        advance();
+
+        StringBuilder sb = new StringBuilder();
+        while (pos < code.length() && (Character.isLetterOrDigit(peek()) || peek() == '_')) {
+            sb.append(advance());
+        }
+        return new Token(TokenType.VARIABLE, sb.toString(), line);
+    }
+
     private Token readNumber() {
         StringBuilder sb = new StringBuilder();
         if (peek() == '-') {
@@ -102,6 +126,11 @@ public class Lexer {
             case "scoreboard" -> new Token(TokenType.SCOREBOARD, word, line);
             case "set" -> new Token(TokenType.SET, word, line);
             case "add" -> new Token(TokenType.ADD, word, line);
+            case "execute" -> new Token(TokenType.EXECUTE, word, line);
+            case "if" -> new Token(TokenType.IF, word, line);
+            case "score" -> new Token(TokenType.SCORE, word, line);
+            case "matches" -> new Token(TokenType.MATCHES, word, line);
+            case "run" -> new Token(TokenType.RUN, word, line);
             default -> new Token(TokenType.IDENTIFIER, word, line);
         };
     }
