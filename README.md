@@ -8,7 +8,7 @@ __MCLang__ is an interpreted programming language that uses __Minecraft__ comman
 
 Uhmm... __NO__
 
-# Commads
+# Commands
 
 ```bash
 # Lang version
