@@ -3,12 +3,9 @@ package org.dvhume.mclang.lexer;
 import java.util.ArrayList;
 import java.util.List;
 
-/*
- * Copyright (c) 2026 DvHume
- *
- * Licensed under the MIT License.
- * See the LICENSE file in the project root for license information
- */
+/**
+ @author No Author
+ **/
 public class Lexer {
 
     private final String code;

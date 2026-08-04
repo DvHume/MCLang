@@ -4,7 +4,7 @@
 
 __MCLang__ is an interpreted programming language that uses __Minecraft__ commands as keywords.
 
-## Is it possible to write a simle program in it?
+## Is it possible to write a simple program in it?
 
 Uhmm... __NO__
 
