@@ -16,7 +16,7 @@ mclang --version
 mclang -v
 
 # Run File
-mclang run <filename.mcl>
+mclang run <file.mcl>
 ```
 
 # How to install?
