@@ -21,6 +21,8 @@ mclang run <file.mcl>
 
 # How to install?
 
+> I'm assuming you already have Java 21 or higher installed.
+
 Just go to releases, download the archive, unzip it and add the path to the new folder to your PATH
 
 LICENSED by [GPL-3.0](LICENSE)

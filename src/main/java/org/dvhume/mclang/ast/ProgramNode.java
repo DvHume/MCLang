@@ -16,7 +16,7 @@ public class ProgramNode extends ASTNode{
 
     public static class SayStatementNode extends ASTNode {
 
-        private final Token valueToken; //Строка, число или переменная
+        private final Token valueToken; //String, number or variable
 
         public SayStatementNode(Token valueToken) {
             this.valueToken = valueToken;
@@ -44,7 +44,7 @@ public class ProgramNode extends ASTNode{
 
     public static class ExecuteIfNode extends ASTNode {
         private final String varName;
-        private final Token expectedValue; // Число или переменная
+        private final Token expectedValue; // Number or variable
         private final ASTNode thenBranch; // What? Команда, которая выполнится, если условие верно
 
         public ExecuteIfNode(String varName, Token expectedValue, ASTNode thenBranch) {
