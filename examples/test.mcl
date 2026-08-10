@@ -3,4 +3,8 @@ scoreboard add player_hp -100
 
 say "Check..."
 
+#
+# execute if score <variable> matches <value> run <statement>
+#
+
 execute if score player_hp matches 0 run say "Player dead" # Result: Player dead

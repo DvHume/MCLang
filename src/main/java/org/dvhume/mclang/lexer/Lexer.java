@@ -128,6 +128,7 @@ public class Lexer {
             case "score" -> new Token(TokenType.SCORE, word, line);
             case "matches" -> new Token(TokenType.MATCHES, word, line);
             case "run" -> new Token(TokenType.RUN, word, line);
+            case "else" -> new Token(TokenType.ELSE, word, line);
             default -> new Token(TokenType.IDENTIFIER, word, line);
         };
     }

@@ -49,8 +49,11 @@ public class Interpreter {
         Object actualVal = env.get(ifNode.getVarName());
         Object expectedVal = evaluateToken(ifNode.getExpectedValue());
 
-        if (actualVal != null && actualVal.equals(expectedVal)) {
+        boolean condition = actualVal != null && actualVal.equals(expectedVal);
+        if (condition) {
             execute(ifNode.getThenBranch());
+        } else if (ifNode.getElseBranch() != null) {
+            execute(ifNode.getElseBranch());
         }
     }
 

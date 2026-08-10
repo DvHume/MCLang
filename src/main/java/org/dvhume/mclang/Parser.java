@@ -80,7 +80,16 @@ public class Parser {
   consume(TokenType.RUN, "Expected 'run'");
 
   ASTNode thenBranch = parseStatement();
-  return new ProgramNode.ExecuteIfNode(varToken.getValue(), expectedValue, thenBranch);
+  ASTNode elseBranch = null;
+  if (peek().getType() == TokenType.ELSE) {
+      consume(TokenType.ELSE, "Else");
+      consume(TokenType.RUN, "\nError: Expected 'run'");
+      if (isAtEnd()) {
+       throw new RuntimeException("\nString " + peek().getLine() + ": The 'else' branch cannot be empty. Expected a command\n");
+      }
+      elseBranch = parseStatement();
+  }
+  return new ProgramNode.ExecuteIfNode(varToken.getValue(), expectedValue, thenBranch, elseBranch);
  }
 
  private boolean isAtEnd() {

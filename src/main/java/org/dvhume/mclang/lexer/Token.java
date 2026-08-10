@@ -20,6 +20,6 @@ public class Token {
 
     @Override
     public String toString() {
-        return String.format("Token{%s, 's', line=%d}", type, value, line);
+        return String.format("Token{%s, '%s', line=%d}", type, value, line);
     }
 }

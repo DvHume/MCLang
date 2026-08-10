@@ -46,15 +46,18 @@ public class ProgramNode extends ASTNode{
         private final String varName;
         private final Token expectedValue; // Number or variable
         private final ASTNode thenBranch; // What? Команда, которая выполнится, если условие верно
+        private final ASTNode elseBranch; // Команда, которая выполнится в else
 
-        public ExecuteIfNode(String varName, Token expectedValue, ASTNode thenBranch) {
+        public ExecuteIfNode(String varName, Token expectedValue, ASTNode thenBranch, ASTNode elseBranch) {
             this.varName = varName;
             this.expectedValue = expectedValue;
             this.thenBranch = thenBranch;
+            this.elseBranch = elseBranch;
         }
 
         public String getVarName() { return varName; }
         public Token getExpectedValue() { return expectedValue; }
         public ASTNode getThenBranch() { return thenBranch; }
+        public ASTNode getElseBranch() { return elseBranch; }
     }
 }

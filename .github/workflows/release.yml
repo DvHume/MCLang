@@ -1,0 +1,50 @@
+name: MCLang Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Build
+        run: mvn clean package
+
+      - name: Prepare release files
+        run: |
+          mkdir release
+
+          cp target/*.jar release/
+          cp mclang.bat release/
+          cp mclang.sh release/
+          cp LICENSE release/
+
+      - name: Create ZIP
+        run: |
+          cd release
+          zip -r ../mclang-${GITHUB_REF_NAME}.zip .
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: MCLang ${{ github.ref_name }}
+          prerelease: true
+          generate_release_notes: true
+          files: mclang-${{ github.ref_name }}.zip

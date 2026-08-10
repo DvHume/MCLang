@@ -14,7 +14,7 @@ import java.nio.file.Path;
 public class Main {
     public static void main(String[] args) {
         if (args.length > 0 && (args[0].equals("--version") || args[0].equals("-v"))) {
-            System.out.println("MCLang v0.1.0 (Java 21+)");
+            System.out.println("MCLang v0.2.1 (Java 21+)");
             return;
         }
         if (args.length < 2 || !args[0].equals("run")) {
@@ -53,7 +53,7 @@ public class Main {
     }
 
     private static void printUsage() {
-        System.out.print("\nUnknown command ");
+        System.out.print("\nUnknown command. ");
         System.out.println("Use: mclang run <file.mcl> Run File");
     }
 }
