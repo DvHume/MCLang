@@ -3,7 +3,7 @@ package org.dvhume.mclang.lexer;
 public enum TokenType {
     // COMMANDS
     SAY, SCOREBOARD, EXECUTE, IF, SCORE, MATCHES, RUN, ELSE,
-    SET, ADD,
+    SET, ADD, LBRACE, RBRACE, COMMA,
     // OPERATORS
     PLUS, MINUS, STAR, SLASH,EQUAL,
     // LITERALS
