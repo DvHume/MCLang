@@ -36,20 +36,20 @@ LICENSED by [GPL-3.0](LICENSE)
 ```
 The project is divided into several main parts:
 
-- `ast/` — Abstract Syntax Tree (AST) nodes:
-- `ASTNode` — The base class of AST nodes
-- `ProgramNode` — The root program node and nodes for individual constructs.
+- ast/ — Abstract Syntax Tree (AST) nodes:
+- ASTNode — The base class of AST nodes
+- ProgramNode — The root program node and nodes for individual constructs.
 
-- `lexer/` — Lexical analysis:
-- `Lexer` — Translates source code into sequences of tokens.
+- lexer/ — Lexical analysis:
+- Lexer — Translates source code into sequences of tokens.
 
-- `Token` — Represents a single token.
+- Token — Represents a single token.
 
-- `TokenType` — Types of language tokens.
+- TokenType — Types of language tokens.
 
-- `Environment` — Stores program state and variables during execution.
+- Environment — Stores program state and variables during execution.
 
-- "Translator" — Implements the AST and implements language constructs.
+- Interpreter — Implements the AST and implements language constructs.
 
 The remaining classes are located in the root package, as they do not currently require a separate structural unit.
 ```
