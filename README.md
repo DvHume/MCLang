@@ -8,7 +8,7 @@ __MCLang__ is an interpreted programming language that uses __Minecraft__ comman
 
 Uhmm... __NO__
 
-# Commands
+# CLI
 
 ```bash
 # Lang version
@@ -30,3 +30,26 @@ LICENSED by [GPL-3.0](LICENSE)
 > [!NOTE]
 >
 > This is a study project, feel free to scold me for any reason, I wil not read it. Thanks!
+
+## Architecture
+
+```
+The project is divided into several main parts:
+
+- `ast/` — Abstract Syntax Tree (AST) nodes:
+- `ASTNode` — The base class of AST nodes
+- `ProgramNode` — The root program node and nodes for individual constructs.
+
+- `lexer/` — Lexical analysis:
+- `Lexer` — Translates source code into sequences of tokens.
+
+- `Token` — Represents a single token.
+
+- `TokenType` — Types of language tokens.
+
+- `Environment` — Stores program state and variables during execution.
+
+- "Translator" — Implements the AST and implements language constructs.
+
+The remaining classes are located in the root package, as they do not currently require a separate structural unit.
+```
