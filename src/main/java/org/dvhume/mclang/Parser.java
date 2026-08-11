@@ -41,14 +41,25 @@ public class Parser {
 
  private ProgramNode.SayStatementNode parseSay() {
   consume(TokenType.SAY, "Expected: 'say'");
-  Token value = advance();
+  consume(TokenType.LBRACE, "Expected '{' after 'say'");
+  List<Token> values = new ArrayList<>();
 
-  if (value.getType() != TokenType.STRING &&
-      value.getType() != TokenType.NUMBER &&
-      value.getType() != TokenType.VARIABLE) {
-   throw new RuntimeException("String: " + value.getLine() + ": The 'say' command accept a string, number or variable!");
+  while (!isAtEnd() && peek().getType() != TokenType.RBRACE) {
+   Token value = advance();
+
+   if (value.getType() != TokenType.STRING &&
+           value.getType() != TokenType.NUMBER &&
+           value.getType() != TokenType.VARIABLE) {
+    throw new RuntimeException("String: " + value.getLine() + ": The 'say' command accept a string, number or variable!");
+   }
+   values.add(value);
+   if (peek().getType() == TokenType.COMMA) { advance(); }
   }
-  return new ProgramNode.SayStatementNode(value);
+  if (isAtEnd()) {
+   throw new RuntimeException("String " + peek().getLine() + ": Expected '}' after 'say'");
+  }
+  consume(TokenType.RBRACE, "Expected '}' after 'say'");
+  return new ProgramNode.SayStatementNode(values);
  }
 
  private ProgramNode.ScoreboardStatementNode parseScoreboard() {

@@ -51,6 +51,9 @@ public class Lexer {
             else if (c == '*') { advance(); tokens.add(new Token(TokenType.STAR, "*", line)); }
             else if (c == '/') { advance(); tokens.add(new Token(TokenType.SLASH, "/", line)); }
             else if (c == '=') { advance(); tokens.add(new Token(TokenType.EQUAL, "=", line)); }
+            else if (c == '{') { advance(); tokens.add(new Token(TokenType.LBRACE, "{", line)); }
+            else if (c == '}') { advance(); tokens.add(new Token(TokenType.RBRACE, "}", line)); }
+            else if (c == ',') { advance(); tokens.add(new Token(TokenType.COMMA, ",", line)); }
             else {
                 throw new RuntimeException("String " + line + ": Unknown symbol '" + c + "'");
             }

@@ -16,13 +16,13 @@ public class ProgramNode extends ASTNode{
 
     public static class SayStatementNode extends ASTNode {
 
-        private final Token valueToken; //String, number or variable
+        private final List<Token> valueTokens; //String, number or variable
 
-        public SayStatementNode(Token valueToken) {
-            this.valueToken = valueToken;
+        public SayStatementNode(List<Token> valueTokens) {
+            this.valueTokens = valueTokens;
         }
 
-        public Token getValueToken() { return valueToken; }
+        public List<Token> getValueTokens() { return valueTokens; }
     }
 
     public static class ScoreboardStatementNode extends ASTNode {

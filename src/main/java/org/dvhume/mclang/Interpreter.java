@@ -25,9 +25,11 @@ public class Interpreter {
     }
 
     private void executeSay(ProgramNode.SayStatementNode node) {
-        Token val = node.getValueToken();
-        Object result = evaluateToken(val);
-        System.out.println(result);
+        for (Token token : node.getValueTokens()) {
+            Object result = evaluateToken(token);
+            System.out.println(result);
+        }
+        System.out.println();
     }
 
     private void executeScoreboard(ProgramNode.ScoreboardStatementNode node) {
