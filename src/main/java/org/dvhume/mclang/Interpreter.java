@@ -27,7 +27,7 @@ public class Interpreter {
     private void executeSay(ProgramNode.SayStatementNode node) {
         for (Token token : node.getValueTokens()) {
             Object result = evaluateToken(token);
-            System.out.println(result);
+            System.out.print(result);
         }
         System.out.println();
     }

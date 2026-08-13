@@ -1,7 +1,7 @@
 scoreboard set player_hp 100
 scoreboard add player_hp -50
 
-say "Check..."
+say {"Check..."}
 
 #
 # execute if score <variable> matches <value> run <statement>

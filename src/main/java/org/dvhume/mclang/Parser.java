@@ -10,114 +10,145 @@ import java.util.List;
 
 public class Parser {
 
- private final List<Token> tokens;
- private int current = 0;
+    private final List<Token> tokens;
+    private int current = 0;
 
- public Parser(List<Token> tokens) {
-  this.tokens = tokens;
- }
+    public Parser(List<Token> tokens) {
+        this.tokens = tokens;
+    }
 
- public ProgramNode parse() {
-  List<ASTNode> statements = new ArrayList<>();
+    public ProgramNode parse() {
+        List<ASTNode> statements = new ArrayList<>();
 
-  while (!isAtEnd()) {
-   statements.add(parseStatement());
-  }
-  return new ProgramNode(statements);
- }
+        while (!isAtEnd()) {
+            statements.add(parseStatement());
+        }
+        return new ProgramNode(statements);
+    }
 
- private ASTNode parseStatement() {
-  Token token = peek();
+    private ASTNode parseStatement() {
+        Token token = peek();
 
-  if (token.getType() == TokenType.SAY) {
-   return parseSay();
-  } else if (token.getType() == TokenType.SCOREBOARD) {
-   return parseScoreboard();
-  } else if (token.getType() == TokenType.EXECUTE) {
-   return parseExecute();
-  }
-  throw new RuntimeException("String " + token.getLine() + ": Command expected, received: " + token.getValue());
- }
+        if (token.getType() == TokenType.SAY) {
+            return parseSay();
+        } else if (token.getType() == TokenType.SCOREBOARD) {
+            return parseScoreboard();
+        } else if (token.getType() == TokenType.EXECUTE) {
+            return parseExecute();
+        }
+        throw new RuntimeException("String " + token.getLine() + ": Command expected, received: " + token.getValue());
+    }
 
- private ProgramNode.SayStatementNode parseSay() {
-  consume(TokenType.SAY, "Expected: 'say'");
-  consume(TokenType.LBRACE, "Expected '{' after 'say'");
-  List<Token> values = new ArrayList<>();
+    private ProgramNode.SayStatementNode parseSay() {
+        consume(TokenType.SAY, "Expected: 'say'");
+        consume(TokenType.LBRACE, "Expected '{' after 'say'");
 
-  while (!isAtEnd() && peek().getType() != TokenType.RBRACE) {
-   Token value = advance();
+        List<Token> values = new ArrayList<>();
 
-   if (value.getType() != TokenType.STRING &&
-           value.getType() != TokenType.NUMBER &&
-           value.getType() != TokenType.VARIABLE) {
-    throw new RuntimeException("String: " + value.getLine() + ": The 'say' command accept a string, number or variable!");
-   }
-   values.add(value);
-   if (peek().getType() == TokenType.COMMA) { advance(); }
-  }
-  if (isAtEnd()) {
-   throw new RuntimeException("String " + peek().getLine() + ": Expected '}' after 'say'");
-  }
-  consume(TokenType.RBRACE, "Expected '}' after 'say'");
-  return new ProgramNode.SayStatementNode(values);
- }
+        // Первый аргумент
+        Token value = advance();
 
- private ProgramNode.ScoreboardStatementNode parseScoreboard() {
-  consume(TokenType.SCOREBOARD, "Expected 'scoreboard'");
+        if (value.getType() != TokenType.STRING &&
+                value.getType() != TokenType.NUMBER &&
+                value.getType() != TokenType.VARIABLE) {
 
-  Token modeToken = advance();
-  if (modeToken.getType() != TokenType.SET && modeToken.getType() != TokenType.ADD) {
-   throw  new RuntimeException("String " + modeToken.getLine() + ": Expected 'set' or 'add'");
-  }
+            throw new RuntimeException(
+                    "String: " + value.getLine() +
+                            ": The 'say' command accept a string, number or variable!"
+            );
+        }
 
-  Token varToken = consume(TokenType.IDENTIFIER, "Expected variable name");
-  Token valueToken = advance();
+        values.add(value);
 
-  if (valueToken.getType() != TokenType.NUMBER && valueToken.getType() != TokenType.VARIABLE) {
-   throw new RuntimeException("String " + valueToken.getLine() + ": The value must be a number or a variable");
-  }
-  return new ProgramNode.ScoreboardStatementNode(modeToken.getValue(), varToken.getValue(), valueToken);
- }
+        // Остальные аргументы
+        while (peek().getType() != TokenType.RBRACE) {
 
- private ASTNode parseExecute() {
-  consume(TokenType.EXECUTE, "Expected 'execute'");
-  consume(TokenType.IF, "Expected 'if'");
-  consume(TokenType.SCORE, "Expected 'score'");
+            // Если есть ещё аргумент — между ними ОБЯЗАТЕЛЬНА запятая
+            consume(TokenType.COMMA, "Expected ',' between arguments");
 
-  Token varToken = consume(TokenType.IDENTIFIER, "Expected variable name");
-  consume(TokenType.MATCHES, "Expected 'matches'");
+            Token nextValue = advance();
 
-  Token expectedValue = advance();
-  consume(TokenType.RUN, "Expected 'run'");
+            if (nextValue.getType() != TokenType.STRING &&
+                    nextValue.getType() != TokenType.NUMBER &&
+                    nextValue.getType() != TokenType.VARIABLE) {
 
-  ASTNode thenBranch = parseStatement();
-  ASTNode elseBranch = null;
-  if (peek().getType() == TokenType.ELSE) {
-      consume(TokenType.ELSE, "Else");
-      consume(TokenType.RUN, "\nError: Expected 'run'");
-      if (isAtEnd()) {
-       throw new RuntimeException("\nString " + peek().getLine() + ": The 'else' branch cannot be empty. Expected a command\n");
-      }
-      elseBranch = parseStatement();
-  }
-  return new ProgramNode.ExecuteIfNode(varToken.getValue(), expectedValue, thenBranch, elseBranch);
- }
+                throw new RuntimeException(
+                        "String: " + nextValue.getLine() +
+                                ": The 'say' command accept a string, number or variable!"
+                );
+            }
 
- private boolean isAtEnd() {
-  return peek().getType() == TokenType.EOF;
- }
+            values.add(nextValue);
+        }
 
- private Token peek() {
-  return tokens.get(current);
- }
+        if (isAtEnd()) {
+            throw new RuntimeException(
+                    "String " + peek().getLine() +
+                            ": Expected '}' after 'say'"
+            );
+        }
 
- private Token advance() {
-  if (!isAtEnd()) current++;
-  return tokens.get(current - 1);
- }
+        consume(TokenType.RBRACE, "Expected '}' after 'say'");
 
- private Token consume(TokenType type, String errorMSG) {
-  if (peek().getType() == type) return advance();
-  throw new RuntimeException("String " + peek().getLine() + ": " + errorMSG);
- }
+        return new ProgramNode.SayStatementNode(values);
+    }
+
+    private ProgramNode.ScoreboardStatementNode parseScoreboard() {
+        consume(TokenType.SCOREBOARD, "Expected 'scoreboard'");
+
+        Token modeToken = advance();
+        if (modeToken.getType() != TokenType.SET && modeToken.getType() != TokenType.ADD) {
+            throw new RuntimeException("String " + modeToken.getLine() + ": Expected 'set' or 'add'");
+        }
+
+        Token varToken = consume(TokenType.IDENTIFIER, "Expected variable name");
+        Token valueToken = advance();
+
+        if (valueToken.getType() != TokenType.NUMBER && valueToken.getType() != TokenType.VARIABLE) {
+            throw new RuntimeException("String " + valueToken.getLine() + ": The value must be a number or a variable");
+        }
+        return new ProgramNode.ScoreboardStatementNode(modeToken.getValue(), varToken.getValue(), valueToken);
+    }
+
+    private ASTNode parseExecute() {
+        consume(TokenType.EXECUTE, "Expected 'execute'");
+        consume(TokenType.IF, "Expected 'if'");
+        consume(TokenType.SCORE, "Expected 'score'");
+
+        Token varToken = consume(TokenType.IDENTIFIER, "Expected variable name");
+        consume(TokenType.MATCHES, "Expected 'matches'");
+
+        Token expectedValue = advance();
+        consume(TokenType.RUN, "Expected 'run'");
+
+        ASTNode thenBranch = parseStatement();
+        ASTNode elseBranch = null;
+        if (peek().getType() == TokenType.ELSE) {
+            consume(TokenType.ELSE, "Else");
+            consume(TokenType.RUN, "\nError: Expected 'run'");
+            if (isAtEnd()) {
+                throw new RuntimeException("\nString " + peek().getLine() + ": The 'else' branch cannot be empty. Expected a command\n");
+            }
+            elseBranch = parseStatement();
+        }
+        return new ProgramNode.ExecuteIfNode(varToken.getValue(), expectedValue, thenBranch, elseBranch);
+    }
+
+    private boolean isAtEnd() {
+        return peek().getType() == TokenType.EOF;
+    }
+
+    private Token peek() {
+        return tokens.get(current);
+    }
+
+    private Token advance() {
+        if (!isAtEnd()) current++;
+        return tokens.get(current - 1);
+    }
+
+    private Token consume(TokenType type, String errorMSG) {
+        if (peek().getType() == type) return advance();
+        throw new RuntimeException("String " + peek().getLine() + ": " + errorMSG);
+    }
 }

@@ -3,5 +3,4 @@ scoreboard set player_hp 100 # "set" Sets the value
 scoreboard add player_hp -20 # "add " Changes the value
 
 # Print
-say "Player health:"
-say $player_hp # "$" denotes a variable
+say {"Player health: ", $player_hp} # "$" denotes a variable
