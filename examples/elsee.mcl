@@ -13,4 +13,4 @@ execute if score player_hp matches 0 run say "Player dead" # Result: Player dead
 # execute if score <variable> matches <value> run <statement> else run <statement>
 #
 
-execute if score player_hp matches 0 run say "Player dead" else run say "Player alive" #Result # Player alive
+execute if score player_hp matches 0 run say {"Player dead"} else run say {"Player alive"} # Result: Player alive

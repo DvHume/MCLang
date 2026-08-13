@@ -1,3 +1,8 @@
+> [!WARNING]
+>
+> The latest release is out of date!
+> The new release is not coming soon
+
 # MCLang
 
 ## What is it?
