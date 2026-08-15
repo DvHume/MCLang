@@ -61,7 +61,7 @@ public class Parser {
         values.add(value);
 
         // Остальные аргументы
-        while (peek().getType() != TokenType.RBRACE) {
+        while (!isAtEnd() && peek().getType() != TokenType.RBRACE) {
 
             // Если есть ещё аргумент — между ними ОБЯЗАТЕЛЬНА запятая
             consume(TokenType.COMMA, "Expected ',' between arguments");
