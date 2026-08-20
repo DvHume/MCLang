@@ -2,6 +2,9 @@ package org.dvhume.mclang;
 
 import org.dvhume.mclang.ast.ASTNode;
 import org.dvhume.mclang.ast.ProgramNode;
+import org.dvhume.mclang.ast.ProgramNode.SayStatementNode;
+import org.dvhume.mclang.ast.ProgramNode.ScoreboardStatementNode;
+import org.dvhume.mclang.ast.ProgramNode.ExecuteIfNode;
 import org.dvhume.mclang.lexer.Token;
 
 public class Interpreter {
@@ -15,16 +18,16 @@ public class Interpreter {
     }
 
     private void execute(ASTNode node) {
-        if (node instanceof ProgramNode.ScoreboardStatementNode scoreboard) {
+        if (node instanceof ScoreboardStatementNode scoreboard) {
             executeScoreboard(scoreboard);
-        } else if (node instanceof ProgramNode.SayStatementNode say) {
+        } else if (node instanceof SayStatementNode say) {
             executeSay(say);
-        } else if (node instanceof ProgramNode.ExecuteIfNode execIf) {
+        } else if (node instanceof ExecuteIfNode execIf) {
             executeIf(execIf);
         }
     }
 
-    private void executeSay(ProgramNode.SayStatementNode node) {
+    private void executeSay(SayStatementNode node) {
         for (Token token : node.getValueTokens()) {
             Object result = evaluateToken(token);
             System.out.print(result);
@@ -32,7 +35,7 @@ public class Interpreter {
         System.out.println();
     }
 
-    private void executeScoreboard(ProgramNode.ScoreboardStatementNode node) {
+    private void executeScoreboard(ScoreboardStatementNode node) {
         Object val = evaluateToken(node.getValueToken());
         if (!(val instanceof Integer intVal)) {
             throw new RuntimeException("The value in 'scoreboard' must be a number");
@@ -47,7 +50,7 @@ public class Interpreter {
         }
     }
 
-    private void executeIf(ProgramNode.ExecuteIfNode ifNode) {
+    private void executeIf(ExecuteIfNode ifNode) {
         Object actualVal = env.get(ifNode.getVarName());
         Object expectedVal = evaluateToken(ifNode.getExpectedValue());
 

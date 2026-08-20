@@ -2,6 +2,9 @@ package org.dvhume.mclang;
 
 import org.dvhume.mclang.ast.ASTNode;
 import org.dvhume.mclang.ast.ProgramNode;
+import org.dvhume.mclang.ast.ProgramNode.SayStatementNode;
+import org.dvhume.mclang.ast.ProgramNode.ScoreboardStatementNode;
+import org.dvhume.mclang.ast.ProgramNode.ExecuteIfNode;
 import org.dvhume.mclang.lexer.Token;
 import org.dvhume.mclang.lexer.TokenType;
 
@@ -39,7 +42,7 @@ public class Parser {
         throw new RuntimeException("String " + token.getLine() + ": Command expected, received: " + token.getValue());
     }
 
-    private ProgramNode.SayStatementNode parseSay() {
+    private SayStatementNode parseSay() {
         consume(TokenType.SAY, "Expected: 'say'");
         consume(TokenType.LBRACE, "Expected '{' after 'say'");
 
@@ -90,10 +93,10 @@ public class Parser {
 
         consume(TokenType.RBRACE, "Expected '}' after 'say'");
 
-        return new ProgramNode.SayStatementNode(values);
+        return new SayStatementNode(values);
     }
 
-    private ProgramNode.ScoreboardStatementNode parseScoreboard() {
+    private ScoreboardStatementNode parseScoreboard() {
         consume(TokenType.SCOREBOARD, "Expected 'scoreboard'");
 
         Token modeToken = advance();
@@ -107,7 +110,7 @@ public class Parser {
         if (valueToken.getType() != TokenType.NUMBER && valueToken.getType() != TokenType.VARIABLE) {
             throw new RuntimeException("String " + valueToken.getLine() + ": The value must be a number or a variable");
         }
-        return new ProgramNode.ScoreboardStatementNode(modeToken.getValue(), varToken.getValue(), valueToken);
+        return new ScoreboardStatementNode(modeToken.getValue(), varToken.getValue(), valueToken);
     }
 
     private ASTNode parseExecute() {
@@ -131,7 +134,7 @@ public class Parser {
             }
             elseBranch = parseStatement();
         }
-        return new ProgramNode.ExecuteIfNode(varToken.getValue(), expectedValue, thenBranch, elseBranch);
+        return new ExecuteIfNode(varToken.getValue(), expectedValue, thenBranch, elseBranch);
     }
 
     private boolean isAtEnd() {
