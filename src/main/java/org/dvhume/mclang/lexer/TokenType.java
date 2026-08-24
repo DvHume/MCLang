@@ -8,5 +8,5 @@ public enum TokenType {
     PLUS, MINUS, STAR, SLASH,EQUAL,
     // LITERALS
     IDENTIFIER, NUMBER, STRING, VARIABLE,
-    EOF
+    EOF, ERROR
 }

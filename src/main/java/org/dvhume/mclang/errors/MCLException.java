@@ -1,15 +1,20 @@
 package org.dvhume.mclang.errors;
 
+import org.dvhume.mclang.lexer.Token;
+
 /**
  * @author DvHume
  */
 
 public class MCLException extends RuntimeException {
-    private final int line;
-    public MCLException(int line, String msg) {
+    private final Token token;
+    private final String helpHint;
+    public MCLException(Token token, String msg, String helpHint) {
         super(msg);
-        this.line = line;
+        this.token = token;
+        this.helpHint = helpHint;
     }
 
-    public int getLine() { return line; }
+    public Token getToken() { return token; }
+    public String getHelpHint() { return helpHint; }
 }

@@ -1,0 +1,13 @@
+package org.dvhume.mclang.errors;
+/*
+ * Created by DvHume in 24.08.2026.
+*/
+
+import org.dvhume.mclang.lexer.Token;
+
+public class ParserError extends MCLException{
+
+    public ParserError(Token token, String msg, String helpHint) {
+        super(token, msg, helpHint);
+    }
+}

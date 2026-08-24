@@ -1,5 +1,7 @@
 package org.dvhume.mclang.lexer;
 
+import org.dvhume.mclang.errors.LexerError;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,6 +13,7 @@ public class Lexer {
     private final String code;
     private  int pos = 0;
     private int line = 1;
+    private int column = 1;
 
     public Lexer(String code) {
         this.code = code;
@@ -26,7 +29,8 @@ public class Lexer {
                 advance();
             } else if (c == '\n') {
                 line++;
-                advance();
+                column = 1;
+                pos++;
             } else if (c == '#') {
                 while (pos < code.length() && peek() != '\n') { advance(); }
             } else if (c == '"') {
@@ -37,28 +41,42 @@ public class Lexer {
                 tokens.add(readNumber());
             } else if (Character.isLetter(c) || c == '_') {
                 tokens.add(readIdentifier());
-            } else if (c == '+') {
-                advance();
-                tokens.add(new Token(TokenType.PLUS, "+", line));
-            } else if (c == '-') {
-                if (Character.isDigit(peekNext())) {
-                    tokens.add(readNumber());
-                } else {
+            } else {
+                int startCol = column;
+                if (c == '+') {
                     advance();
-                    tokens.add(new Token(TokenType.MINUS, "-", line));
+                    tokens.add(new Token(TokenType.PLUS, "+", line, startCol));
+                } else if (c == '-') {
+                    if (Character.isDigit(peekNext())) {
+                        tokens.add(readNumber());
+                    } else {
+                        advance();
+                        tokens.add(new Token(TokenType.MINUS, "-", line, startCol));
+                    }
+                } else if (c == '*') {
+                    advance();
+                    tokens.add(new Token(TokenType.STAR, "*", line, startCol));
+                } else if (c == '/') {
+                    advance();
+                    tokens.add(new Token(TokenType.SLASH, "/", line, startCol));
+                } else if (c == '=') {
+                    advance();
+                    tokens.add(new Token(TokenType.EQUAL, "=", line, startCol));
+                } else if (c == '{') {
+                    advance();
+                    tokens.add(new Token(TokenType.LBRACE, "{", line, startCol));
+                } else if (c == '}') {
+                    advance();
+                    tokens.add(new Token(TokenType.RBRACE, "}", line, startCol));
+                } else if (c == ',') {
+                    advance();
+                    tokens.add(new Token(TokenType.COMMA, ",", line, startCol));
+                } else {
+                    throw new LexerError(line, startCol, "Unknown symbol '" + c + "'");
                 }
             }
-            else if (c == '*') { advance(); tokens.add(new Token(TokenType.STAR, "*", line)); }
-            else if (c == '/') { advance(); tokens.add(new Token(TokenType.SLASH, "/", line)); }
-            else if (c == '=') { advance(); tokens.add(new Token(TokenType.EQUAL, "=", line)); }
-            else if (c == '{') { advance(); tokens.add(new Token(TokenType.LBRACE, "{", line)); }
-            else if (c == '}') { advance(); tokens.add(new Token(TokenType.RBRACE, "}", line)); }
-            else if (c == ',') { advance(); tokens.add(new Token(TokenType.COMMA, ",", line)); }
-            else {
-                throw new RuntimeException("String " + line + ": Unknown symbol '" + c + "'");
-            }
         }
-        tokens.add(new Token(TokenType.EOF, "", line));
+        tokens.add(new Token(TokenType.EOF, "", line, column));
         return tokens;
     }
 
@@ -71,39 +89,46 @@ public class Lexer {
     }
 
     private char advance() {
-        return code.charAt(pos++);
+        char c = code.charAt(pos++);
+        column++;
+        return c;
     }
 
     private Token readString() {
         int startLine = line;
+        int startCol = column;
         advance();
 
         StringBuilder sb = new StringBuilder();
         while (pos < code.length() && peek() != '"') {
-            char c = advance();
+            char c = peek();
             if (c == '\n') {
                 line++;
+                column = 1;
+                pos++;
             }
-            sb.append(c);
+            sb.append(advance());
         }
         if (pos >= code.length()) {
-            throw new RuntimeException("String " + startLine + ": Unclosed quotation mark!");
+            throw new LexerError(startLine, startCol, ": Unterminated string literal");
         }
         advance();
-        return new Token(TokenType.STRING, sb.toString(), startLine);
+        return new Token(TokenType.STRING, sb.toString(), startLine, startCol);
     }
 
     private Token readVariable() {
+        int startCol = column;
         advance();
 
         StringBuilder sb = new StringBuilder();
         while (pos < code.length() && (Character.isLetterOrDigit(peek()) || peek() == '_')) {
             sb.append(advance());
         }
-        return new Token(TokenType.VARIABLE, sb.toString(), line);
+        return new Token(TokenType.VARIABLE, sb.toString(), line, startCol);
     }
 
     private Token readNumber() {
+        int startCol = column;
         StringBuilder sb = new StringBuilder();
         if (peek() == '-') {
             sb.append(advance());
@@ -111,28 +136,30 @@ public class Lexer {
         while (pos < code.length() && Character.isDigit(peek())) {
             sb.append(advance());
         }
-        return new Token(TokenType.NUMBER, sb.toString(), line);
+        return new Token(TokenType.NUMBER, sb.toString(), line, startCol);
     }
 
     private Token readIdentifier() {
+        int startCol = column;
         StringBuilder sb = new StringBuilder();
         while (pos < code.length() && (Character.isLetterOrDigit(peek()) || peek() == '_')) {
             sb.append(advance());
         }
         String word = sb.toString();
 
-        return switch (word) {
-            case "say" -> new Token(TokenType.SAY, word, line);
-            case "scoreboard" -> new Token(TokenType.SCOREBOARD, word, line);
-            case "set" -> new Token(TokenType.SET, word, line);
-            case "add" -> new Token(TokenType.ADD, word, line);
-            case "execute" -> new Token(TokenType.EXECUTE, word, line);
-            case "if" -> new Token(TokenType.IF, word, line);
-            case "score" -> new Token(TokenType.SCORE, word, line);
-            case "matches" -> new Token(TokenType.MATCHES, word, line);
-            case "run" -> new Token(TokenType.RUN, word, line);
-            case "else" -> new Token(TokenType.ELSE, word, line);
-            default -> new Token(TokenType.IDENTIFIER, word, line);
+        TokenType type = switch (word) {
+            case "say" -> TokenType.SAY;
+            case "scoreboard" -> TokenType.SCOREBOARD;
+            case "set" -> TokenType.SET;
+            case "add" -> TokenType.ADD;
+            case "execute" -> TokenType.EXECUTE;
+            case "if" -> TokenType.IF;
+            case "score" -> TokenType.SCORE;
+            case "matches" -> TokenType.MATCHES;
+            case "run" -> TokenType.RUN;
+            case "else" -> TokenType.ELSE;
+            default -> TokenType.IDENTIFIER;
         };
+        return new Token(type, word, line, startCol);
     }
 }

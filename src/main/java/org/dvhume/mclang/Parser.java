@@ -5,6 +5,7 @@ import org.dvhume.mclang.ast.ProgramNode;
 import org.dvhume.mclang.ast.ProgramNode.SayStatementNode;
 import org.dvhume.mclang.ast.ProgramNode.ScoreboardStatementNode;
 import org.dvhume.mclang.ast.ProgramNode.ExecuteIfNode;
+import org.dvhume.mclang.errors.ParserError;
 import org.dvhume.mclang.lexer.Token;
 import org.dvhume.mclang.lexer.TokenType;
 
@@ -43,8 +44,8 @@ public class Parser {
     }
 
     private SayStatementNode parseSay() {
-        consume(TokenType.SAY, "Expected: 'say'");
-        consume(TokenType.LBRACE, "Expected '{' after 'say'");
+        consume(TokenType.SAY, "Expected: 'say'", "'say {arg}'");
+        consume(TokenType.LBRACE, "'{'", "You forgot the opening square bracket.");
 
         List<Token> values = new ArrayList<>();
 
@@ -65,9 +66,7 @@ public class Parser {
 
         // Остальные аргументы
         while (!isAtEnd() && peek().getType() != TokenType.RBRACE) {
-
-            // Если есть ещё аргумент — между ними ОБЯЗАТЕЛЬНА запятая
-            consume(TokenType.COMMA, "Expected ',' between arguments");
+            consume(TokenType.COMMA, "',' between arguments", "Arguments must be separated by commas if there are several");
 
             Token nextValue = advance();
 
@@ -91,20 +90,20 @@ public class Parser {
             );
         }
 
-        consume(TokenType.RBRACE, "Expected '}' after 'say'");
+        consume(TokenType.RBRACE, "'}' after 'say'", "'say' must have both opening and closing square brackets");
 
         return new SayStatementNode(values);
     }
 
     private ScoreboardStatementNode parseScoreboard() {
-        consume(TokenType.SCOREBOARD, "Expected 'scoreboard'");
+        consume(TokenType.SCOREBOARD, "Expected 'scoreboard'", "'scoreboard <set/add> <name> <value>");
 
         Token modeToken = advance();
         if (modeToken.getType() != TokenType.SET && modeToken.getType() != TokenType.ADD) {
             throw new RuntimeException("String " + modeToken.getLine() + ": Expected 'set' or 'add'");
         }
 
-        Token varToken = consume(TokenType.IDENTIFIER, "Expected variable name");
+        Token varToken = consume(TokenType.IDENTIFIER, "variable name", "Variables must have a name");
         Token valueToken = advance();
 
         if (valueToken.getType() != TokenType.NUMBER && valueToken.getType() != TokenType.VARIABLE) {
@@ -114,21 +113,21 @@ public class Parser {
     }
 
     private ASTNode parseExecute() {
-        consume(TokenType.EXECUTE, "Expected 'execute'");
-        consume(TokenType.IF, "Expected 'if'");
-        consume(TokenType.SCORE, "Expected 'score'");
+        consume(TokenType.EXECUTE, "Expected 'execute'", "'execute'");
+        consume(TokenType.IF, "'if'", "'execute' requires the presence of 'if' because it is part of it's structure");
+        consume(TokenType.SCORE, "'score'", "'score' is required to take the name of your variable");
 
-        Token varToken = consume(TokenType.IDENTIFIER, "Expected variable name");
-        consume(TokenType.MATCHES, "Expected 'matches'");
+        Token varToken = consume(TokenType.IDENTIFIER, "variable name", "Enter the name of the variable that will be used in the condition");
+        consume(TokenType.MATCHES, "'matches'", "'matches' is needed to establish the condition");
 
         Token expectedValue = advance();
-        consume(TokenType.RUN, "Expected 'run'");
+        consume(TokenType.RUN, "'run'", "run executes the command if the condition is true (for 'if') or false (for 'else')");
 
         ASTNode thenBranch = parseStatement();
         ASTNode elseBranch = null;
         if (peek().getType() == TokenType.ELSE) {
-            consume(TokenType.ELSE, "Else");
-            consume(TokenType.RUN, "\nError: Expected 'run'");
+            consume(TokenType.ELSE, "Else", "<else>");
+            consume(TokenType.RUN, "'run'", "run executes the command if the condition is true (for 'if') or false (for 'else')");
             if (isAtEnd()) {
                 throw new RuntimeException("\nString " + peek().getLine() + ": The 'else' branch cannot be empty. Expected a command\n");
             }
@@ -150,8 +149,8 @@ public class Parser {
         return tokens.get(current - 1);
     }
 
-    private Token consume(TokenType type, String errorMSG) {
+    private Token consume(TokenType type, String expected, String help) {
         if (peek().getType() == type) return advance();
-        throw new RuntimeException("String " + peek().getLine() + ": " + errorMSG);
+        throw new ParserError(peek(), "expected '" + expected + "', found '" + peek().getValue() + "'", help);
     }
 }

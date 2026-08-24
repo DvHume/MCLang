@@ -2,6 +2,8 @@ package org.dvhume.mclang;
 
 
 import org.dvhume.mclang.ast.ProgramNode;
+import org.dvhume.mclang.errors.ErrorReporter;
+import org.dvhume.mclang.errors.MCLException;
 import org.dvhume.mclang.lexer.Lexer;
 
 import java.nio.file.Files;
@@ -14,7 +16,7 @@ import java.nio.file.Path;
 public class Main {
     public static void main(String[] args) {
         if (args.length > 0 && (args[0].equals("--version") || args[0].equals("-v"))) {
-            System.out.println("MCLang v0.3.0 (Java 21+)");
+            System.out.println("MCLang v0.4.0");
             return;
         }
         if (args.length < 2 || !args[0].equals("run")) {
@@ -29,6 +31,7 @@ public class Main {
             return;
         }
 
+        String code = "";
         try {
             Path path = Path.of(filePath);
             if (!Files.exists(path)) {
@@ -36,7 +39,7 @@ public class Main {
                 return;
             }
 
-            String code = Files.readString(path);
+            code = Files.readString(path);
 
             Lexer lexer = new Lexer(code);
             var tokens = lexer.tokenize();
@@ -46,8 +49,11 @@ public class Main {
 
             Interpreter interpreter = new Interpreter();
             interpreter.interpret(programNode);
+        } catch (MCLException e) {
+            ErrorReporter reporter = new ErrorReporter(code, filePath);
+            reporter.report(e);
         } catch (Exception e) {
-            System.err.println("Runtime error");
+            System.err.println("\033[31;1m[Internal Error]\033[0m Unexpected system failrule:");
             e.printStackTrace();
         }
     }

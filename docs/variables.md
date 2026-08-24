@@ -11,7 +11,7 @@ scoreboard set hp 10 <-- value
 
 2. 
 ```python
-# Same thing but `ad` changes the value
+# Same thing but `add` changes the value
 scoreboard add hp -5
 ```
 
@@ -31,8 +31,14 @@ execute if score hp matches 100 run say {"Player hp: ", $hp}
 
 * Moreover, `if` always requires `run` even if the condition is not met
 * If `run` is not present, the following error will be thrown:
-```
-Runtime error: String 4: Expected 'run'
+```bash
+error: expected ''run'', found ''
+ --> da.mcl:4:30
+   |
+ 4 | execute if score hp matches 0
+   |                              ^
+   |
+   = help: run executes the command if the condition is true (for 'if') or false (for 'else')
 ```
 
 ## With `else` also
