@@ -27,11 +27,11 @@ execute if score hp matches 100 run say {"Player hp: ", $hp}
 ```
 1. `score` - points to a variable
 2. `matches` - Condition
-2. `run` - execute the command if the condition is true
+3. `run` - execute the command if the condition is true
 
 * Moreover, `if` always requires `run` even if the condition is not met
 * If `run` is not present, the following error will be thrown:
-```bash
+```
 error: expected ''run'', found ''
  --> da.mcl:4:30
    |

@@ -53,7 +53,7 @@ public class Main {
             ErrorReporter reporter = new ErrorReporter(code, filePath);
             reporter.report(e);
         } catch (Exception e) {
-            System.err.println("\033[31;1m[Internal Error]\033[0m Unexpected system failrule:");
+            System.err.println("[Internal Error] Unexpected system failure:");
             e.printStackTrace();
         }
     }

@@ -3,14 +3,12 @@ scoreboard add player_hp -50
 
 say {"Check..."}
 
-#
-# execute if score <variable> matches <value> run <statement>
-#
+# IF
+# # Result: Player dead
 
-execute if score player_hp matches 0 run say "Player dead" # Result: Player dead
+execute if score player_hp matches 0 run say "Player dead"
 
 # ELSE
-# execute if score <variable> matches <value> run <statement> else run <statement>
-#
+# # Result: Player alive
 
-execute if score player_hp matches 0 run say {"Player dead"} else run say {"Player alive"} # Result: Player alive
+execute if score player_hp matches 0 run say {"Player dead"} else run say {"Player alive"}

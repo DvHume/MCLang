@@ -90,7 +90,7 @@ public class Parser {
             );
         }
 
-        consume(TokenType.RBRACE, "'}' after 'say'", "'say' must have both opening and closing square brackets");
+        consume(TokenType.RBRACE, "Expected '}' after 'say'", "'say' must have both opening and closing square brackets");
 
         return new SayStatementNode(values);
     }
