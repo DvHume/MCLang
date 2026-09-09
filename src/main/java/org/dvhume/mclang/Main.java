@@ -1,7 +1,7 @@
 package org.dvhume.mclang;
 
-
 import org.dvhume.mclang.ast.ProgramNode;
+import org.dvhume.mclang.errors.Ansi;
 import org.dvhume.mclang.errors.ErrorReporter;
 import org.dvhume.mclang.errors.MCLException;
 import org.dvhume.mclang.lexer.Lexer;
@@ -32,6 +32,7 @@ public class Main {
         }
 
         String code = "";
+        ErrorReporter reporter = null;
         try {
             Path path = Path.of(filePath);
             if (!Files.exists(path)) {
@@ -40,20 +41,24 @@ public class Main {
             }
 
             code = Files.readString(path);
+            reporter = new ErrorReporter(code, filePath);
 
             Lexer lexer = new Lexer(code);
             var tokens = lexer.tokenize();
 
-            Parser parser = new Parser(tokens);
+            Parser parser = new Parser(tokens, reporter);
             ProgramNode programNode = parser.parse();
 
             Interpreter interpreter = new Interpreter();
             interpreter.interpret(programNode);
         } catch (MCLException e) {
-            ErrorReporter reporter = new ErrorReporter(code, filePath);
-            reporter.report(e);
+            if (reporter != null) {
+                reporter.report(e);
+            } else {
+                System.err.println(e.getMessage());
+            }
         } catch (Exception e) {
-            System.err.println("[Internal Error] Unexpected system failure:");
+            System.err.printf("%s Unexpected system failure:%n", Ansi.redBold("[Internal Error]"));
             e.printStackTrace();
         }
     }

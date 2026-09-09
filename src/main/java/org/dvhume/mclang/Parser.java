@@ -5,6 +5,7 @@ import org.dvhume.mclang.ast.ProgramNode;
 import org.dvhume.mclang.ast.ProgramNode.SayStatementNode;
 import org.dvhume.mclang.ast.ProgramNode.ScoreboardStatementNode;
 import org.dvhume.mclang.ast.ProgramNode.ExecuteIfNode;
+import org.dvhume.mclang.errors.ErrorReporter;
 import org.dvhume.mclang.errors.ParserError;
 import org.dvhume.mclang.lexer.Token;
 import org.dvhume.mclang.lexer.TokenType;
@@ -16,9 +17,16 @@ public class Parser {
 
     private final List<Token> tokens;
     private int current = 0;
+    private final ErrorReporter errorReporter;
 
     public Parser(List<Token> tokens) {
         this.tokens = tokens;
+        this.errorReporter = null;
+    }
+
+    public Parser(List<Token> tokens, ErrorReporter errorReporter) {
+        this.tokens = tokens;
+        this.errorReporter = errorReporter;
     }
 
     public ProgramNode parse() {
@@ -40,59 +48,86 @@ public class Parser {
         } else if (token.getType() == TokenType.EXECUTE) {
             return parseExecute();
         }
-        throw new RuntimeException("String " + token.getLine() + ": Command expected, received: " + token.getValue());
+        throw new ParserError(token, "Command expected, received: " + token.getValue(), "Use 'say', 'scoreboard', or 'execute'");
     }
 
     private SayStatementNode parseSay() {
-        consume(TokenType.SAY, "Expected: 'say'", "'say {arg}'");
-        consume(TokenType.LBRACE, "'{'", "You forgot the opening square bracket.");
+        Token sayToken = consume(TokenType.SAY, "Expected: 'say'", "'say {arg}'");
+        consume(TokenType.LBRACE, "'{'", "You forgot the opening curly brace.");
 
         List<Token> values = new ArrayList<>();
 
-        // Первый аргумент
+        // Проверяем, не пустой ли блок
+        if (peek().getType() == TokenType.RBRACE) {
+            // Пустой say {} - выдаём предупреждение
+            if (errorReporter != null) {
+                errorReporter.reportWarning(
+                        sayToken,
+                        "Empty 'say' statement does nothing",
+                        "Consider adding some content inside say {}"
+                );
+            } else {
+                System.err.println("warning: Empty 'say' statement");
+            }
+        } else {
+            Token value = parseArgument();
+            values.add(value);
+
+            while (!isAtEnd() && peek().getType() != TokenType.RBRACE) {
+                if (peek().getType() != TokenType.COMMA) {
+                    Token currentToken = peek();
+                    throw new ParserError(
+                            currentToken,
+                            "Expected ',' between arguments or '}' to close the block",
+                            "Separate arguments with commas: say {\"str\", arg, arg2}"
+                    );
+                }
+
+                consume(TokenType.COMMA, "',' between arguments", "Arguments must be separated by commas if there are several");
+
+                // После запятой должен быть аргумент
+                if (peek().getType() == TokenType.RBRACE) {
+                    throw new ParserError(
+                            peek(),
+                            "Expected argument after comma",
+                            "Remove trailing comma or add an argument"
+                    );
+                }
+
+                Token nextValue = parseArgument();
+                values.add(nextValue);
+            }
+        }
+
+        // Проверяем, есть ли закрывающая скобка
+        if (isAtEnd()) {
+            throw new ParserError(
+                    tokens.get(tokens.size() - 1),
+                    "Expected '}' after 'say' block",
+                    "'say' must have both opening and closing curly braces"
+            );
+        }
+
+        consume(TokenType.RBRACE, "Expected '}' after 'say'", "'say' must have both opening and closing curly braces");
+
+        return new SayStatementNode(values);
+    }
+
+    private Token parseArgument() {
         Token value = advance();
 
         if (value.getType() != TokenType.STRING &&
                 value.getType() != TokenType.NUMBER &&
                 value.getType() != TokenType.VARIABLE) {
 
-            throw new RuntimeException(
-                    "String: " + value.getLine() +
-                            ": The 'say' command accept a string, number or variable!"
+            throw new ParserError(
+                    value,
+                    "The 'say' command accepts a string, number or variable!",
+                    "Use a string, number, or variable inside say {}"
             );
         }
 
-        values.add(value);
-
-        // Остальные аргументы
-        while (!isAtEnd() && peek().getType() != TokenType.RBRACE) {
-            consume(TokenType.COMMA, "',' between arguments", "Arguments must be separated by commas if there are several");
-
-            Token nextValue = advance();
-
-            if (nextValue.getType() != TokenType.STRING &&
-                    nextValue.getType() != TokenType.NUMBER &&
-                    nextValue.getType() != TokenType.VARIABLE) {
-
-                throw new RuntimeException(
-                        "String: " + nextValue.getLine() +
-                                ": The 'say' command accept a string, number or variable!"
-                );
-            }
-
-            values.add(nextValue);
-        }
-
-        if (isAtEnd()) {
-            throw new RuntimeException(
-                    "String " + peek().getLine() +
-                            ": Expected '}' after 'say'"
-            );
-        }
-
-        consume(TokenType.RBRACE, "Expected '}' after 'say'", "'say' must have both opening and closing square brackets");
-
-        return new SayStatementNode(values);
+        return value;
     }
 
     private ScoreboardStatementNode parseScoreboard() {
@@ -100,14 +135,14 @@ public class Parser {
 
         Token modeToken = advance();
         if (modeToken.getType() != TokenType.SET && modeToken.getType() != TokenType.ADD) {
-            throw new RuntimeException("String " + modeToken.getLine() + ": Expected 'set' or 'add'");
+            throw new ParserError(modeToken, "Expected 'set' or 'add'", "Use 'set' to assign or 'add' to increment");
         }
 
         Token varToken = consume(TokenType.IDENTIFIER, "variable name", "Variables must have a name");
         Token valueToken = advance();
 
         if (valueToken.getType() != TokenType.NUMBER && valueToken.getType() != TokenType.VARIABLE) {
-            throw new RuntimeException("String " + valueToken.getLine() + ": The value must be a number or a variable");
+            throw new ParserError(valueToken, "The value must be a number or a variable", "Use a number or an existing variable");
         }
         return new ScoreboardStatementNode(modeToken.getValue(), varToken.getValue(), valueToken);
     }
@@ -129,7 +164,7 @@ public class Parser {
             consume(TokenType.ELSE, "Else", "<else>");
             consume(TokenType.RUN, "'run'", "run executes the command if the condition is true (for 'if') or false (for 'else')");
             if (isAtEnd()) {
-                throw new RuntimeException("\nString " + peek().getLine() + ": The 'else' branch cannot be empty. Expected a command\n");
+                throw new ParserError(peek(), "The 'else' branch cannot be empty. Expected a command", "Add a command after 'else run'");
             }
             elseBranch = parseStatement();
         }
