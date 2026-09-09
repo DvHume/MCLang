@@ -25,6 +25,37 @@ mclang run <file.mcl>
 
 Just go to releases, download the archive, unzip it and add the path to the new folder to your PATH
 
+# Building from source
+> Why do you need this?
+
+> [!WARNING]
+> Please note that this is a guide for building a .jar file, not an executable program.
+>
+
+Please note that the following instructions assume you are using Windows.
+* Make sure you have Java 21 or higher. If not, download it here: [Adoptium](https://adoptium.net/temurin/releases?version=21&os=any&arch=any)
+* Install Git (if you don't have it): [Git](https://git-scm.com/install/windows)
+1. Open Git Bash:
+ Press the Windows key, type "Git Bash," and press ENTER
+ Enter the directory where you want to store your source code
+```bash
+cd $HOME/Downloads
+```
+
+2. Clone the repository
+```bash
+git clone https://github.com/DvHume/MCLang.git
+```
+3. Change to the source code directory
+```bash
+cd McLang
+```
+4. Run the build
+```bash
+./mvnw clean package
+```
+5. Locate the source file (usually the target/ folder)
+
 LICENSED by [GPL-3.0](LICENSE)
 
 > [!NOTE]
