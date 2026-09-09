@@ -29,7 +29,7 @@ Just go to releases, download the archive, unzip it and add the path to the new 
 > Why do you need this?
 
 > [!WARNING]
-> Please note that this is a guide for building a .jar file, not an executable program.
+> This guide is for building a .jar file, not an executable program. To run commands like "mclang -v," you'll need a script (.sh, .bat) and a path to the PATH variable.
 >
 
 Please note that the following instructions assume you are using Windows.
@@ -56,31 +56,8 @@ cd McLang
 ```
 5. Locate the source file (usually the target/ folder)
 
-LICENSED by [GPL-3.0](LICENSE)
+LICENSE [GPL-3.0](LICENSE)
 
 > [!NOTE]
 >
-> This is a study project, feel free to scold me for any reason, I wil not read it. Thanks!
-
-## Architecture
-
-```
-The project is divided into several main parts:
-
-- ast/ — Abstract Syntax Tree (AST) nodes:
-- ASTNode — The base class of AST nodes
-- ProgramNode — The root program node and nodes for individual constructs.
-
-- lexer/ — Lexical analysis:
-- Lexer — Translates source code into sequences of tokens.
-
-- Token — Represents a single token.
-
-- TokenType — Types of language tokens.
-
-- Environment — Stores program state and variables during execution.
-
-- Interpreter — Implements the AST and implements language constructs.
-
-The remaining classes are located in the root package, as they do not currently require a separate structural unit.
-```
+> This is a study project, feel free to scold me for any reason, I will not read it. Thanks!
