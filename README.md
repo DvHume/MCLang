@@ -29,7 +29,7 @@ Just go to releases, download the archive, unzip it and add the path to the new 
 > Why do you need this?
 
 > [!WARNING]
-> This guide is for building a .jar file, not an executable program. To run commands like "mclang -v," you'll need a script (.sh, .bat) and a path to the PATH variable.
+> This guide is for creating a JAR file, not an executable program. To run commands like "mclang -v," you'll need a script (.sh, .bat) and the path to the folder containing the script and JAR file in your PATH variable.
 >
 
 Please note that the following instructions assume you are using Windows.

@@ -28,17 +28,17 @@ jobs:
 
       - name: Prepare release files
         run: |
-          mkdir release
+          mkdir -p release/MCLang
 
-          cp target/*.jar release/
-          cp mclang.bat release/
-          cp mclang.sh release/
-          cp LICENSE release/
+          cp target/*.jar release/MCLang/
+          cp mclang.bat release/MCLang/
+          cp mclang.sh release/MCLang/
+          cp LICENSE release/MCLang/
 
       - name: Create ZIP
         run: |
           cd release
-          zip -r ../mclang-${GITHUB_REF_NAME}.zip .
+          zip -r ../mclang-${GITHUB_REF_NAME}.zip MCLang/
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
