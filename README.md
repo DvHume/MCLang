@@ -29,7 +29,7 @@ Just go to releases, download the archive, unzip it and add the path to the new 
 > Why do you need this?
 
 > [!WARNING]
-> This guide is for creating a JAR file, not an executable program. To run commands like "mclang -v," you'll need a script (.sh, .bat) and the path to the folder containing the script and JAR file in your PATH variable.
+> This guide is for creating a JAR file, not an executable program. To run commands like __"mclang -v,"__ you'll need a script (.sh, .bat) and the path to the folder containing the script and JAR file in your PATH variable.
 >
 
 Please note that the following instructions assume you are using Windows.
@@ -54,7 +54,7 @@ cd McLang
 ```bash
 ./mvnw clean package
 ```
-5. Locate the source file (usually the target/ folder)
+5. Locate the source file (Typically this is the __target/__ folder.)
 
 LICENSE [GPL-3.0](LICENSE)
 
