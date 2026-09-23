@@ -64,7 +64,7 @@ public class Main {
     }
 
     private static void printUsage() {
-        System.out.print("\nUnknown command. ");
+        System.out.print("Unknown command. ");
         System.out.println("Use: mclang run <file.mcl> Run File");
     }
 }
