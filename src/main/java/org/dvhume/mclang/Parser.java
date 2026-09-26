@@ -48,7 +48,7 @@ public class Parser {
         } else if (token.getType() == TokenType.EXECUTE) {
             return parseExecute();
         }
-        throw new ParserError(token, "Command expected, received: " + token.getValue(), "Try to write something meaningful, \ndon't be like me, don't write shit code, \nalthough my language is shit code");
+        throw new ParserError(token, "Command expected, received: " + token.getValue(), "Try to write something meaningful, \n\tdon't be like me, don't write shit code, \n\talthough my language is shit code");
     }
 
     private SayStatementNode parseSay() {
