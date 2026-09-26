@@ -39,3 +39,9 @@ jobs:
         run: |
           cd release
           zip -r ../mclang-${GITHUB_REF_NAME}.zip MCLang/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mclang-${{ github.ref_name }}
+          path: mclang-${{ github.ref_name }}.zip
