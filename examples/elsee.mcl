@@ -6,7 +6,7 @@ say {"Check..."}
 # IF
 # Result: Player dead
 
-execute if score player_hp matches 0 run say "Player dead"
+execute if score player_hp matches 0 run say {"Player dead"}
 
 # ELSE
 # Result: Player alive

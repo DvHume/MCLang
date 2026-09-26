@@ -1,0 +1,41 @@
+name: MCLang Build
+
+on:
+  push:
+    branches:
+      - 'test_branch_N3'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Build
+        run: mvn clean package
+
+      - name: Prepare archive files
+        run: |
+          mkdir -p release/MCLang
+
+          cp target/*.jar release/MCLang/
+          cp mclang.bat release/MCLang/
+          cp mclang.sh release/MCLang/
+          cp LICENSE release/MCLang/
+
+      - name: Create ZIP
+        run: |
+          cd release
+          zip -r ../mclang-${GITHUB_REF_NAME}.zip MCLang/
